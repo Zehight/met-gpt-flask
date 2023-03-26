@@ -4,9 +4,10 @@ from flask import Flask, request, render_template, jsonify
 import os
 import subprocess
 import requests
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 
 
 def trans_to_wav(file):
