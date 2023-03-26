@@ -2,8 +2,8 @@ import json
 import time
 from flask import Flask, request, render_template, jsonify
 import os
-import subprocess
 import requests
+import ffmpeg
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -15,9 +15,9 @@ def trans_to_wav(file):
     try:
         new_file_path = os.path.join('audio_' + file.filename.rsplit('.', 1)[0] + '.wav')
         file.save(file_path)
-        subprocess.call(
-            ["ffmpeg", "-i", file_path, "-vn", "-acodec", "libmp3lame", "-b:a", "16K", "-ac", "1", "-filter:a",
-             "atempo=1.5", new_file_path])
+        input_file = ffmpeg.input(file_path)
+        output_file = input_file.filter('atempo', tempo=1.5).output(new_file_path, codec='libmp3lame', ac=1, ar='16k',format='mp3')
+        ffmpeg.run(output_file, overwrite_output=True)
     except Exception as e:
         os.remove(file_path)
         raise e
